@@ -12,18 +12,22 @@
 pragma solidity >=0.8.0;
 
 import { IElkPair } from "./interfaces/IElkPair.sol";
-import { StakingRewards } from "./StakingRewards.sol";
+import { StakingRewardsWithILP } from "./StakingRewardsWithILP.sol";
 import { ElkV2StakingStrategy } from "./ElkV2StakingStrategy.sol";
-import { IElkV2FarmingRewards } from "./interfaces/IElkV2FarmingRewards.sol";
+import { IElkV2FarmingRewardsWithILP } from "./interfaces/IElkV2FarmingRewardsWithILP.sol";
 
 /**
  * Contract enabling staking permissions for FarmingRewards.
  */
-contract ElkV2FarmingRewards is IElkV2FarmingRewards, StakingRewards {
+contract ElkV2FarmingRewardsWithILP is IElkV2FarmingRewardsWithILP, StakingRewardsWithILP {
     /* ========== CONSTRUCTOR ========== */
 
     /**
+     * @param _oracleAddress address of the ElkDex oracle
      * @param _lpTokenAddress address of the staking LP token (must be an ElkDex LP)
+     * @param _coverageTokenAddress address of the token that the coverage is paid in
+     * @param _coverageAmount total amount of coverage
+     * @param _coverageVestingDuration time it takes to vest 100% of the coverage (min. 1 day)
      * @param _rewardTokenAddresses addresses the reward tokens (must be ERC20)
      * @param _rewardsDuration reward emission duration
      * @param _whitelisting whether whitelisting of stakers should be enabled or not
@@ -32,7 +36,11 @@ contract ElkV2FarmingRewards is IElkV2FarmingRewards, StakingRewards {
      * @param _unstakingFeeSchedule assumes a sorted array
      */
     constructor(
+        address _oracleAddress,
         address _lpTokenAddress, // address of the staking LP token (must be an ElkDex LP)
+        address _coverageTokenAddress,
+        uint256 _coverageAmount,
+        uint32 _coverageVestingDuration,
         address[] memory _rewardTokenAddresses, // addresses the reward tokens (must be ERC20)
         uint256 _rewardsDuration, // reward emission duration
         bool _whitelisting,
@@ -40,7 +48,8 @@ contract ElkV2FarmingRewards is IElkV2FarmingRewards, StakingRewards {
         uint16[] memory _unstakingFeesBps,
         uint32[] memory _unstakingFeeSchedule
     )
-        StakingRewards(
+        StakingRewardsWithILP(
+            _oracleAddress,
             address(
                 new ElkV2StakingStrategy(
                     IElkPair(_lpTokenAddress).factory(),
@@ -52,6 +61,9 @@ contract ElkV2FarmingRewards is IElkV2FarmingRewards, StakingRewards {
                     _unstakingFeeSchedule
                 )
             ),
+            _coverageTokenAddress,
+            _coverageAmount,
+            _coverageVestingDuration,
             _rewardTokenAddresses,
             _rewardsDuration
         )

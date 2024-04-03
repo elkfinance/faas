@@ -397,7 +397,7 @@ contract StakingRewards is IStakingRewards, ReentrancyGuard, Ownable {
      * @param _recipient address of the recipient
      */
     function _getReward(address _tokenAddress, address _recipient) private {
-        if (msg.sender != owner() || msg.sender != _recipient) revert SenderNotOwnerOrRecipient();
+        if (msg.sender != owner() && msg.sender != _recipient) revert SenderNotOwnerOrRecipient();
         if (!rewardTokenAddresses[_tokenAddress]) revert UnknownRewardToken(_tokenAddress);
         uint256 reward = rewards[_tokenAddress][_recipient];
         if (reward > 0) {

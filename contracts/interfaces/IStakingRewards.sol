@@ -25,7 +25,7 @@ interface IStakingRewards {
     /**
      * @dev Returns the staking strategy.
      */
-    function stakingStrategy() external returns (IStakingStrategy);
+    function stakingStrategy() external view returns (IStakingStrategy);
 
     /**
      * @dev Returns the address of the staking token.
@@ -36,13 +36,13 @@ interface IStakingRewards {
     /**
      * @dev Returns the total supply of the staked token.
      */
-    function totalSupply() external returns (uint256);
+    function totalSupply() external view returns (uint256);
 
     /**
      * @dev Returns the balance of the given account.
      * @param _account The address of the account.
      */
-    function balances(address _account) external returns (uint256);
+    function balances(address _account) external view returns (uint256);
 
     /**
      * @dev Returns the period finish time.

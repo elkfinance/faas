@@ -25,25 +25,12 @@ import { FaasFactory } from "./FaasFactory.sol";
 contract ElkV2FarmFactory is IElkV2FarmFactory, FaasFactory {
     using SafeERC20 for IERC20;
 
-    error NoOracleAddress();
-    error NotWhitelistedOracle();
-
-    mapping(address => bool) public override whitelistedOracles;
-
-    constructor(address[] memory _oracleAddresses, address _feeToken) FaasFactory(_feeToken) {
-        for (uint i = 0; i < _oracleAddresses.length; ++i) {
-            if (_oracleAddresses[i] == address(0)) revert NoOracleAddress();
-            whitelistedOracles[_oracleAddresses[i]] = true;
-        }
-    }
+    constructor(address _feeToken) FaasFactory(_feeToken) {}
 
     /**
      * @notice Main function in the contract. Creates a new FarmingRewards contract, stores the farm address by creator and the given LP token, and also stores the creator of the contract by the new farm address.  This is where the fee is taken from the user.
      * @dev each user is only able to create one FarmingRewards contract per LP token.
      * @param _lpTokenAddress The address of the LP token contract.
-     * @param _coverageTokenAddress The address of the ILP coverage token contract.
-     * @param _coverageAmount The amount of ILP coverage tokens to be distributed.
-     * @param _coverageVestingDuration The duration of the vesting period for the ILP coverage tokens.
      * @param _rewardTokenAddresses The addresses of the reward tokens to be distributed.
      * @param _rewardsDuration The duration of the rewards period.
      * @param _depositFeeBps The deposit fee in basis points.
@@ -51,26 +38,17 @@ contract ElkV2FarmFactory is IElkV2FarmFactory, FaasFactory {
      * @param _withdrawalFeeSchedule The schedule for the withdrawal fees.
      */
     function createNewRewards(
-        address _oracleAddress,
         address _lpTokenAddress,
-        address _coverageTokenAddress,
-        uint256 _coverageAmount,
-        uint32 _coverageVestingDuration,
         address[] memory _rewardTokenAddresses,
         uint256 _rewardsDuration,
         uint16 _depositFeeBps,
         uint16[] memory _withdrawalFeesBps,
         uint32[] memory _withdrawalFeeSchedule
     ) external override {
-        if (!whitelistedOracles[_oracleAddress]) revert NotWhitelistedOracle();
         if (faasContract[msg.sender][_lpTokenAddress] != address(0)) revert FaasContractExists();
 
         bytes memory abiCode = abi.encode(
-            _oracleAddress,
             _lpTokenAddress,
-            _coverageTokenAddress,
-            _coverageAmount,
-            _coverageVestingDuration,
             _rewardTokenAddresses,
             _rewardsDuration,
             _depositFeeBps,
@@ -83,10 +61,5 @@ contract ElkV2FarmFactory is IElkV2FarmFactory, FaasFactory {
         address faasContractAddress = ElkV2FarmFactoryHelper.createContract(abiCode, salt, faasContractManager);
 
         takeFeeAndAddContract(faasContractAddress, _lpTokenAddress);
-    }
-
-    function whitelistOracle(address _oracleAddress, bool _whitelisted) external override onlyOwner {
-        whitelistedOracles[_oracleAddress] = _whitelisted;
-        emit OracleWhitelisted(_oracleAddress, _whitelisted);
     }
 }

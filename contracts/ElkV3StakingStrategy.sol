@@ -50,13 +50,12 @@ contract ElkV3StakingStrategy is ERC721StakingStrategy {
     mapping(uint256 => uint256) public positionBalances;
 
     constructor(
-        address _nftPositionManagerAddress,
         address _stakingControllerAddress,
         address _stakingTokenAddress,
         bool _whitelisting
     ) ERC721StakingStrategy(_stakingControllerAddress, _stakingTokenAddress, _whitelisting) {
-        if (_nftPositionManagerAddress == address(0)) revert InvalidAddress();
-        positionManager = INonfungiblePositionManager(_nftPositionManagerAddress);
+        if (_stakingTokenAddress == address(0)) revert InvalidAddress();
+        positionManager = INonfungiblePositionManager(_stakingTokenAddress);
     }
 
     function totalSupply() external view override returns (uint256) {
@@ -71,15 +70,15 @@ contract ElkV3StakingStrategy is ERC721StakingStrategy {
         return balance;
     }
 
-    function stake(address _from, uint256 _tokenId) public override nonReentrant onlyStakingController {
+    /*function stake(address _from, uint256 _tokenId) public override nonReentrant onlyStakingController {
         super.stake(_from, _tokenId);
 
         uint256 balance = _getLiquidity(_tokenId);
         positionBalances[_tokenId] = balance;
         _totalSupply += balance - 1; // Compensate for the +1 done in the parent
-    }
+    }*/
 
-    /*function stake(address _from, uint256 _tokenId) external override nonReentrant onlyStakingController {
+    function stake(address _from, uint256 _tokenId) public override nonReentrant onlyStakingController {
         _tokenId = _beforeStake(_from, _tokenId);
         if (ERC721(stakingTokenAddress).ownerOf(_tokenId) != _from) revert NotTokenOwner();
 
@@ -91,16 +90,16 @@ contract ElkV3StakingStrategy is ERC721StakingStrategy {
         _totalSupply += balance;
 
         emit Staked(_from, _tokenId);
-    }*/
+    }
 
-    function unstake(address _to, uint256 _tokenId) public override nonReentrant onlyStakingController {
+    /*function unstake(address _to, uint256 _tokenId) public override nonReentrant onlyStakingController {
         super.unstake(_to, _tokenId);
 
         _totalSupply -= positionBalances[_tokenId] + 1; // Compensate for the -1 done in the parent
         positionBalances[_tokenId] = 0;
-    }
+    }*/
 
-    /*function unstake(address _to, uint256 _tokenId) public override nonReentrant onlyStakingController {
+    function unstake(address _to, uint256 _tokenId) public override nonReentrant onlyStakingController {
         _tokenId = _beforeUnstake(_to, _tokenId);
         if (tokenOwner[_tokenId] != _to) revert NotTokenOwner();
 
@@ -111,7 +110,7 @@ contract ElkV3StakingStrategy is ERC721StakingStrategy {
         positionBalances[_tokenId] = 0;
 
         emit Unstaked(_to, _tokenId);
-    }*/
+    }
 
     // Function to add a position and update its liquidity
     function _getLiquidity(uint256 tokenId) private view returns (uint256) {

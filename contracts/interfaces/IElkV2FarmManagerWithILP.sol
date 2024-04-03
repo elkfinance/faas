@@ -13,6 +13,15 @@ pragma solidity >=0.8.0;
 
 import { IFaasManager } from "./IFaasManager.sol";
 
-interface IElkV2FarmManager is IFaasManager {
+interface IElkV2FarmManagerWithILP is IFaasManager {
+    function startEmissionWithCoverage(
+        address _farmAddress,
+        uint256[] memory _rewards,
+        uint256 _coverage,
+        uint256 _duration
+    ) external;
+
+    function recoverLeftoverCoverage(address _farmAddress) external;
+
     function recoverFees(address _farmAddress) external;
 }

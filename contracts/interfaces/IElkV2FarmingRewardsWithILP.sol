@@ -11,8 +11,6 @@
 
 pragma solidity >=0.8.0;
 
-import { IFaasManager } from "./IFaasManager.sol";
+import { IStakingRewardsWithILP } from "./IStakingRewardsWithILP.sol";
 
-interface IElkV2FarmManager is IFaasManager {
-    function recoverFees(address _farmAddress) external;
-}
+interface IElkV2FarmingRewardsWithILP is IStakingRewardsWithILP {}

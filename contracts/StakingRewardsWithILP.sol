@@ -15,7 +15,6 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import { IElkDexOracle } from "./interfaces/IElkDexOracle.sol";
 import { IElkPair } from "./interfaces/IElkPair.sol";
-import { IERC20Extended } from "./interfaces/IERC20Extended.sol";
 import { IStakingRewards } from "./interfaces/IStakingRewards.sol";
 import { IStakingRewardsWithILP } from "./interfaces/IStakingRewardsWithILP.sol";
 import { StakingRewards } from "./StakingRewards.sol";
@@ -108,20 +107,6 @@ contract StakingRewardsWithILP is IStakingRewardsWithILP, StakingRewards {
         coverageVestingDuration = _coverageVestingDuration;
     }
 
-    // Optimized version below
-    /*function coveragePerToken() public view returns (uint256) {
-        if (totalSupply == 0) {
-            return coveragePerTokenStored;
-        }
-        return
-            // does this work for non 18 dec tokens?  rate = _coverage / rewardsDuration, here rate is converted back to 18 dec
-            coveragePerTokenStored +
-            ((lastTimeRewardApplicable() - lastUpdateTime) *
-                coverageRate *
-                10**ERC20(coverageTokenAddress).decimals()) /
-            totalSupply;
-    }*/
-
     /**
      * @dev Return the coverage per staked token (in coverage token amounts)
      * @return amount of coverage per staked token
@@ -133,33 +118,8 @@ contract StakingRewardsWithILP is IStakingRewardsWithILP, StakingRewards {
                 : coveragePerTokenStored +
                     (((lastTimeRewardApplicable() - lastUpdateTime) *
                         coverageRate *
-                        10 ** IERC20Extended(coverageTokenAddress).decimals()) / stakingStrategy.totalSupply());
+                        1e18) / stakingStrategy.totalSupply());
     }
-
-    // Code below optimizes this version of the function
-    /*function coverageEarned(address _account) public view returns(uint256) {
-        if (coverageTokenAddress == address(0)) {
-            return 0;
-        }
-        uint256 hodlValue = lpValueWeth(lastStakedPosition[_account]);
-        if (hodlValue == 0) {
-            // prevent division by zero below // equivalent check would be lastStakedPosition[_account].blockTimestamp > 0
-            return coverage[_account];
-        }
-        uint256 outValue = lpValueWeth(position(balances[_account]));
-        uint256 cappedCoverage = (balances[_account] *
-            (coveragePerToken() - userCoveragePerTokenPaid[_account])) / 1e18;
-        uint256 vested = vestedCoverage(
-            hodlValue,
-            outValue,
-            lastStakedPosition[_account].blockTimestamp
-        );
-        if (vested > cappedCoverage) {
-            vested = cappedCoverage;
-        }
-        // amount * (hodl value - out value) / hodl value = amount * (1 - (out value / hodl value))
-        return (vested - (vested * outValue) / hodlValue) + coverage[_account];
-    }*/
 
     /**
      * @dev Return the total coverage earned by a user.
@@ -184,23 +144,7 @@ contract StakingRewardsWithILP is IStakingRewardsWithILP, StakingRewards {
     }
 
     /* ========== MUTATIVE FUNCTIONS ========== */
-
-    // Optimized version of this below
-    /*
-    function getCoverage(
-        address _recipient
-    ) public nonReentrant updateCoverage(_recipient) {
-        if (!(msg.sender == owner() || msg.sender == _recipient)) revert Unauthorized();
-        if (coverageTokenAddress == address(0)) revert InvalidCoverageToken();
-        uint256 cov = coverage[_recipient];
-        if (cov > 0) {
-            coverage[_recipient] = 0;
-            IERC20(coverageTokenAddress).safeTransfer(_recipient, cov);
-            emit CoveragePaid(_recipient, cov);
-        }
-    }
-    */
-
+    
     /**
      * @dev claim the coverage for a staker
      * @param _recipient the address of the staker that should receive the coverage

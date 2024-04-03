@@ -11,6 +11,6 @@
 
 pragma solidity >=0.8.0;
 
-import { IStakingRewardsWithILP } from "./IStakingRewardsWithILP.sol";
+import { IStakingRewards } from "./IStakingRewards.sol";
 
-interface IElkV2FarmingRewards is IStakingRewardsWithILP {}
+interface IElkV2FarmingRewards is IStakingRewards {}

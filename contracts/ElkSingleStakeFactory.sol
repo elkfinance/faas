@@ -41,6 +41,7 @@ contract ElkSingleStakeFactory is IElkSingleStakeFactory, FaasFactory {
         address _stakingTokenAddress,
         address[] memory _rewardTokenAddresses,
         uint256 _rewardsDuration,
+        bool _whitelisting,
         uint16 _depositFeeBps,
         uint16[] memory _withdrawalFeesBps,
         uint32[] memory _withdrawalFeeSchedule
@@ -51,6 +52,7 @@ contract ElkSingleStakeFactory is IElkSingleStakeFactory, FaasFactory {
             _stakingTokenAddress,
             _rewardTokenAddresses,
             _rewardsDuration,
+            _whitelisting,
             _depositFeeBps,
             _withdrawalFeesBps,
             _withdrawalFeeSchedule

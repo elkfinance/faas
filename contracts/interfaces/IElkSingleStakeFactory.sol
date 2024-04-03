@@ -18,6 +18,7 @@ interface IElkSingleStakeFactory is IFaasFactory {
         address _stakingTokenAddress,
         address[] memory _rewardTokenAddresses,
         uint256 _rewardsDuration,
+        bool _whitelisting,
         uint16 _depositFeeBps,
         uint16[] memory _withdrawalFeesBps,
         uint32[] memory _withdrawalFeeSchedule

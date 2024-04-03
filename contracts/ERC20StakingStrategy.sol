@@ -68,7 +68,7 @@ contract ERC20StakingStrategy is StakingStrategy {
      * @dev Unstakes all previously staked tokens.
      * @param _to Address where unstaked tokens should be sent.
      */
-    function unstakeAll(address _to) external override nonReentrant onlyStakingController {
+    function unstakeAll(address _to) external override onlyStakingController {
         unstake(_to, balances[_to]);
     }
 

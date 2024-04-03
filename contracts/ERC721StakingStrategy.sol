@@ -75,7 +75,7 @@ contract ERC721StakingStrategy is StakingStrategy, ERC721Holder {
      * @dev Unstakes all previously staked tokens.
      * @param _to Address where unstaked tokens should be sent.
      */
-    function unstakeAll(address _to) external override nonReentrant onlyStakingController {
+    function unstakeAll(address _to) external override onlyStakingController {
         for (uint i = 0; i < ownedTokens[_to].length; ++i) {
             unstake(_to, ownedTokens[_to][i]);
         }

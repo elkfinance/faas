@@ -14,18 +14,8 @@ pragma solidity >=0.8.0;
 import { IFaasFactory } from "./IFaasFactory.sol";
 
 interface IElkV2FarmFactory is IFaasFactory {
-    event OracleWhitelisted(address indexed oracle, bool whitelisted);
-
-    function whitelistedOracles(address oracle) external view returns (bool);
-
-    function whitelistOracle(address _oracleAddress, bool _whitelisted) external;
-
     function createNewRewards(
-        address _oracleAddress,
         address _lpTokenAddress,
-        address _coverageTokenAddress,
-        uint256 _coverageAmount,
-        uint32 _coverageVestingDuration,
         address[] memory _rewardTokenAddresses,
         uint256 _rewardsDuration,
         uint16 _depositFeeBps,

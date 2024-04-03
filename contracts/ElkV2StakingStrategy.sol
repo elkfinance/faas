@@ -12,6 +12,7 @@
 pragma solidity >=0.8.0;
 
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { IElkPair } from "./interfaces/IElkPair.sol";
 import { ERC20StakingStrategyWithFees } from "./ERC20StakingStrategyWithFees.sol";
 
