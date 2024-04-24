@@ -13,13 +13,13 @@ pragma solidity >=0.8.0;
 
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { ERC20StakingStrategy } from "./ERC20StakingStrategy.sol";
+import { ERC20StakingVault } from "./ERC20StakingVault.sol";
 import { IStakingRewards } from "./interfaces/IStakingRewards.sol";
 
 /**
  * Contract implementing simple ERC20 token staking functionality and supporting staking/unstaking fees (no staking rewards).
  */
-contract ERC20StakingStrategyWithFees is ERC20StakingStrategy {
+contract ERC20StakingVaultWithFees is ERC20StakingVault {
     using SafeERC20 for IERC20;
 
     error InvalidFees();
@@ -78,7 +78,7 @@ contract ERC20StakingStrategyWithFees is ERC20StakingStrategy {
         uint16 _stakingFeeBps,
         uint16[] memory _unstakingFeesBps,
         uint32[] memory _unstakingFeeSchedule
-    ) ERC20StakingStrategy(_stakingControllerAddress, _stakingTokenAddress, _whitelisting) {
+    ) ERC20StakingVault(_stakingControllerAddress, _stakingTokenAddress, _whitelisting) {
         _setFees(_stakingFeeBps, _unstakingFeesBps, _unstakingFeeSchedule);
     }
 

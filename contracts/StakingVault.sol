@@ -15,14 +15,14 @@ import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuar
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import { IStakingStrategy } from "./interfaces/IStakingStrategy.sol";
+import { IStakingVault } from "./interfaces/IStakingVault.sol";
 
 /**
- * @title Staking Strategy Abstract Contract
- * @dev Abstract contract for implementing staking strategies.
+ * @title Staking Vault Vault Contract
+ * @dev Abstract contract for implementing staking vault.
  * It includes basic functionality for staking, unstaking, and recovering tokens.
  */
-abstract contract StakingStrategy is IStakingStrategy, ReentrancyGuard {
+abstract contract StakingVault is IStakingVault, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     error InvalidStakingControllerAddress();
@@ -40,7 +40,7 @@ abstract contract StakingStrategy is IStakingStrategy, ReentrancyGuard {
     /// @notice Address of the token used for staking.
     address public immutable override stakingTokenAddress;
 
-    /// @notice Indicates if whitelisting is enabled for this staking strategy.
+    /// @notice Indicates if whitelisting is enabled for this staking vault.
     bool public whitelisting;
 
     /// @notice Mapping to keep track of whitelisted addresses.

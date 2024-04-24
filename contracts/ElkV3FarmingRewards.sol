@@ -13,7 +13,7 @@ pragma solidity >=0.8.0;
 
 import { IElkV3FarmingRewards } from "./interfaces/IElkV3FarmingRewards.sol";
 import { StakingRewards } from "./StakingRewards.sol";
-import { ElkV3StakingStrategy } from "./ElkV3StakingStrategy.sol";
+import { ElkV3StakingVault } from "./ElkV3StakingVault.sol";
 
 /**
  * Contract enabling staking permissions for FarmingRewards.
@@ -34,7 +34,7 @@ contract ElkV3FarmingRewards is IElkV3FarmingRewards, StakingRewards {
         bool _whitelisting
     )
         StakingRewards(
-            address(new ElkV3StakingStrategy(address(this), _lpTokenAddress, _whitelisting)),
+            address(new ElkV3StakingVault(address(this), _lpTokenAddress, _whitelisting)),
             _rewardTokenAddresses,
             _rewardsDuration
         )

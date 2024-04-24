@@ -134,9 +134,9 @@ abstract contract FaasManager is IFaasManager, Ownable {
         address _faasContractAddress,
         address _tokenAddress,
         uint256 _amount,
-        bool _fromStrategy
+        bool _fromVault
     ) external checkOwnership(_faasContractAddress) {
-        IStakingRewards(_faasContractAddress).recoverERC20(_tokenAddress, msg.sender, _amount, _fromStrategy);
+        IStakingRewards(_faasContractAddress).recoverERC20(_tokenAddress, msg.sender, _amount, _fromVault);
     }
 
     /**
@@ -150,9 +150,9 @@ abstract contract FaasManager is IFaasManager, Ownable {
         address _faasContractAddress,
         address _tokenAddress,
         uint256 _tokenId,
-        bool _fromStrategy
+        bool _fromVault
     ) external checkOwnership(_faasContractAddress) {
-        IStakingRewards(_faasContractAddress).recoverERC721(_tokenAddress, msg.sender, _tokenId, _fromStrategy);
+        IStakingRewards(_faasContractAddress).recoverERC721(_tokenAddress, msg.sender, _tokenId, _fromVault);
     }
 
     /**

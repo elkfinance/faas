@@ -75,7 +75,7 @@ contract StakingRewardsWithILP is IStakingRewardsWithILP, StakingRewards {
 
     /**
      * @param _oracleAddress address of the price oracle
-     * @param _stakingStrategyAddress address of the staking strategy contract (must be configured with an ELP token)
+     * @param _stakingVaultAddress address of the staking vault contract (must be configured with an ELP token)
      * @param _coverageTokenAddress address of the token that the coverage is paid in
      * @param _coverageAmount total amount of coverage
      * @param _coverageVestingDuration time it takes to vest 100% of the coverage (min. 1 day)
@@ -84,15 +84,15 @@ contract StakingRewardsWithILP is IStakingRewardsWithILP, StakingRewards {
      */
     constructor(
         address _oracleAddress,
-        address _stakingStrategyAddress,
+        address _stakingVaultAddress,
         address _coverageTokenAddress,
         uint256 _coverageAmount,
         uint32 _coverageVestingDuration,
         address[] memory _rewardTokenAddresses,
         uint256 _rewardsDuration
-    ) StakingRewards(_stakingStrategyAddress, _rewardTokenAddresses, _rewardsDuration) {
+    ) StakingRewards(_stakingVaultAddress, _rewardTokenAddresses, _rewardsDuration) {
         oracle = IElkDexOracle(_oracleAddress);
-        lpToken = IElkPair(stakingStrategy.stakingTokenAddress());
+        lpToken = IElkPair(stakingVault.stakingTokenAddress());
 
         if (_coverageTokenAddress != address(0)) {
             if (!(lpToken.token0() == _coverageTokenAddress || lpToken.token1() == _coverageTokenAddress))
@@ -113,12 +113,12 @@ contract StakingRewardsWithILP is IStakingRewardsWithILP, StakingRewards {
      */
     function coveragePerToken() public view returns (uint256) {
         return
-            stakingStrategy.totalSupply() == 0
+            stakingVault.totalSupply() == 0
                 ? coveragePerTokenStored
                 : coveragePerTokenStored +
                     (((lastTimeRewardApplicable() - lastUpdateTime) *
                         coverageRate *
-                        1e18) / stakingStrategy.totalSupply());
+                        1e18) / stakingVault.totalSupply());
     }
 
     /**
@@ -135,8 +135,8 @@ contract StakingRewardsWithILP is IStakingRewardsWithILP, StakingRewards {
         if (hodlValue == 0) {
             return coverage[_account];
         }
-        uint256 outValue = lpValueWeth(position(stakingStrategy.balances(_account)));
-        uint256 balance = stakingStrategy.balances(_account);
+        uint256 outValue = lpValueWeth(position(stakingVault.balances(_account)));
+        uint256 balance = stakingVault.balances(_account);
         uint256 cappedCoverage = (balance * (coveragePerToken() - userCoveragePerTokenPaid[_account])) / 1e18;
         uint256 vested = vestedCoverage(hodlValue, outValue, lastStake.blockTimestamp);
         return
@@ -233,7 +233,7 @@ contract StakingRewardsWithILP is IStakingRewardsWithILP, StakingRewards {
      * @param _recipient address to receive the recovered coverage tokens
      */
     function recoverLeftoverCoverage(address _recipient) public onlyOwner whenNotEmitting {
-        if (!(stakingStrategy.totalSupply() == 0 && coverageTokenAddress != address(0))) revert InvalidTotalSupply();
+        if (!(stakingVault.totalSupply() == 0 && coverageTokenAddress != address(0))) revert InvalidTotalSupply();
         _beforeRecoverLeftoverCoverage(_recipient);
         IERC20 token = IERC20(coverageTokenAddress);
         uint256 amount = token.balanceOf(address(this));
@@ -343,7 +343,7 @@ contract StakingRewardsWithILP is IStakingRewardsWithILP, StakingRewards {
             if (_account != address(0)) {
                 coverage[_account] = coverageEarned(_account);
                 userCoveragePerTokenPaid[_account] = coveragePerTokenStored;
-                lastStakedPosition[_account] = position(stakingStrategy.balances(_account)); // don't forget to reset the last position info
+                lastStakedPosition[_account] = position(stakingVault.balances(_account)); // don't forget to reset the last position info
             }
         }
         _;

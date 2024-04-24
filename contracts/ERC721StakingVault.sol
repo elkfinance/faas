@@ -15,9 +15,9 @@ import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import { StakingStrategy } from "./StakingStrategy.sol";
+import { StakingVault } from "./StakingVault.sol";
 
-contract ERC721StakingStrategy is StakingStrategy, ERC721Holder {
+contract ERC721StakingVault is StakingVault, ERC721Holder {
     using SafeERC20 for IERC20;
 
     error NotTokenOwner();
@@ -37,7 +37,7 @@ contract ERC721StakingStrategy is StakingStrategy, ERC721Holder {
         address _stakingControllerAddress,
         address _stakingTokenAddress,
         bool _whitelisting
-    ) StakingStrategy(_stakingControllerAddress, _stakingTokenAddress, _whitelisting) {}
+    ) StakingVault(_stakingControllerAddress, _stakingTokenAddress, _whitelisting) {}
 
     function totalSupply() external view virtual override returns (uint256) {
         return _totalSupply;

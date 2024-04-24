@@ -13,7 +13,7 @@ pragma solidity >=0.8.0;
 
 import { IElkPair } from "./interfaces/IElkPair.sol";
 import { StakingRewardsWithILP } from "./StakingRewardsWithILP.sol";
-import { ElkV2StakingStrategy } from "./ElkV2StakingStrategy.sol";
+import { ElkV2StakingVault } from "./ElkV2StakingVault.sol";
 import { IElkV2FarmingRewardsWithILP } from "./interfaces/IElkV2FarmingRewardsWithILP.sol";
 
 /**
@@ -51,7 +51,7 @@ contract ElkV2FarmingRewardsWithILP is IElkV2FarmingRewardsWithILP, StakingRewar
         StakingRewardsWithILP(
             _oracleAddress,
             address(
-                new ElkV2StakingStrategy(
+                new ElkV2StakingVault(
                     IElkPair(_lpTokenAddress).factory(),
                     address(this),
                     _lpTokenAddress,

@@ -16,7 +16,7 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { FaasManager } from "./FaasManager.sol";
 import { IElkSingleStakeManager } from "./interfaces/IElkSingleStakeManager.sol";
 import { IElkSingleStakingRewards } from "./interfaces/IElkSingleStakingRewards.sol";
-import { ERC20StakingStrategyWithFees } from "./ERC20StakingStrategyWithFees.sol";
+import { ERC20StakingVaultWithFees } from "./ERC20StakingVaultWithFees.sol";
 
 /**
  * This contract serves as the main point of contact between any FarmingRewards creators and their farm contract.
@@ -43,7 +43,7 @@ contract ElkSingleStakeManager is IElkSingleStakeManager, FaasManager {
      * @param _farmAddress The address of the FarmingRewards contract.
      */
     function recoverFees(address _farmAddress) external checkOwnership(_farmAddress) {
-        ERC20StakingStrategyWithFees(address(IElkSingleStakingRewards(_farmAddress).stakingStrategy())).recoverFees(
+        ERC20StakingVaultWithFees(address(IElkSingleStakingRewards(_farmAddress).stakingVault())).recoverFees(
             msg.sender
         );
     }

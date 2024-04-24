@@ -14,7 +14,7 @@ pragma solidity ^0.8.0;
 import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import { ERC721StakingStrategy } from "./ERC721StakingStrategy.sol";
+import { ERC721StakingVault } from "./ERC721StakingVault.sol";
 
 interface INonfungiblePositionManager {
     function positions(
@@ -38,7 +38,7 @@ interface INonfungiblePositionManager {
         );
 }
 
-contract ElkV3StakingStrategy is ERC721StakingStrategy {
+contract ElkV3StakingVault is ERC721StakingVault {
     using SafeERC20 for IERC20;
 
     error InvalidAddress();
@@ -53,7 +53,7 @@ contract ElkV3StakingStrategy is ERC721StakingStrategy {
         address _stakingControllerAddress,
         address _stakingTokenAddress,
         bool _whitelisting
-    ) ERC721StakingStrategy(_stakingControllerAddress, _stakingTokenAddress, _whitelisting) {
+    ) ERC721StakingVault(_stakingControllerAddress, _stakingTokenAddress, _whitelisting) {
         if (_stakingTokenAddress == address(0)) revert InvalidAddress();
         positionManager = INonfungiblePositionManager(_stakingTokenAddress);
     }

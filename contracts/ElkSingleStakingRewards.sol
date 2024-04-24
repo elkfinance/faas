@@ -13,7 +13,7 @@ pragma solidity >=0.8.0;
 
 import { IElkSingleStakingRewards } from "./interfaces/IElkSingleStakingRewards.sol";
 import { StakingRewards } from "./StakingRewards.sol";
-import { ERC20StakingStrategyWithFees } from "./ERC20StakingStrategyWithFees.sol";
+import { ERC20StakingVaultWithFees } from "./ERC20StakingVaultWithFees.sol";
 
 /**
  * Contract enabling staking permissions for FarmingRewards.
@@ -41,7 +41,7 @@ contract ElkSingleStakingRewards is IElkSingleStakingRewards, StakingRewards {
     )
         StakingRewards(
             address(
-                new ERC20StakingStrategyWithFees(
+                new ERC20StakingVaultWithFees(
                     address(this),
                     _stakingTokenAddress,
                     _whitelisting,

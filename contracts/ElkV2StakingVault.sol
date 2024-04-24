@@ -14,12 +14,12 @@ pragma solidity >=0.8.0;
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { IElkPair } from "./interfaces/IElkPair.sol";
-import { ERC20StakingStrategyWithFees } from "./ERC20StakingStrategyWithFees.sol";
+import { ERC20StakingVaultWithFees } from "./ERC20StakingVaultWithFees.sol";
 
 /**
  * Contract implementing simple ERC20 token staking functionality and supporting staking/unstaking fees (no staking rewards).
  */
-contract ElkV2StakingStrategy is ERC20StakingStrategyWithFees {
+contract ElkV2StakingVault is ERC20StakingVaultWithFees {
     using SafeERC20 for IERC20;
 
     error FactoryAddressesMismatched();
@@ -41,7 +41,7 @@ contract ElkV2StakingStrategy is ERC20StakingStrategyWithFees {
         uint16[] memory _unstakingFeesBps,
         uint32[] memory _unstakingFeeSchedule
     )
-        ERC20StakingStrategyWithFees(
+        ERC20StakingVaultWithFees(
             _stakingControllerAddress,
             _stakingTokenAddress,
             _whitelisting,

@@ -13,9 +13,9 @@ pragma solidity ^0.8.0;
 
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { StakingStrategy } from "./StakingStrategy.sol";
+import { StakingVault } from "./StakingVault.sol";
 
-contract ERC20StakingStrategy is StakingStrategy {
+contract ERC20StakingVault is StakingVault {
     using SafeERC20 for IERC20;
 
     error CannotStakeZero();
@@ -31,7 +31,7 @@ contract ERC20StakingStrategy is StakingStrategy {
         address _stakingControllerAddress,
         address _stakingTokenAddress,
         bool _whitelisting
-    ) StakingStrategy(_stakingControllerAddress, _stakingTokenAddress, _whitelisting) {}
+    ) StakingVault(_stakingControllerAddress, _stakingTokenAddress, _whitelisting) {}
 
     /**
      * @dev Stake tokens.

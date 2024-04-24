@@ -12,7 +12,7 @@
 pragma solidity >=0.8.0;
 
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { IStakingStrategy } from "./IStakingStrategy.sol";
+import { IStakingVault } from "./IStakingVault.sol";
 
 /**
  * @title IStakingRewards
@@ -23,9 +23,9 @@ interface IStakingRewards {
     /* ========== VIEW FUNCTIONS ========== */
 
     /**
-     * @dev Returns the staking strategy.
+     * @dev Returns the staking vault.
      */
-    function stakingStrategy() external view returns (IStakingStrategy);
+    function stakingVault() external view returns (IStakingVault);
 
     /**
      * @dev Returns the address of the staking token.
@@ -192,18 +192,18 @@ interface IStakingRewards {
      * @param _tokenAddress The address of the ERC20 token to recover.
      * @param _recipient The address to which the recovered tokens will be sent.
      * @param _amount The amount of tokens to recover.
-     * @param _fromStrategy Whether to recover tokens from the strategy contract (true) or this contract (false).
+     * @param _fromVault Whether to recover tokens from the vault contract (true) or this contract (false).
      */
-    function recoverERC20(address _tokenAddress, address _recipient, uint256 _amount, bool _fromStrategy) external;
+    function recoverERC20(address _tokenAddress, address _recipient, uint256 _amount, bool _fromVault) external;
 
     /**
      * @dev Allows the recovery of accidentally sent ERC721 tokens.
      * @param _tokenAddress The address of the ERC721 token to recover.
      * @param _recipient The address to which the recovered token will be sent.
      * @param _tokenId The ID of the token to recover.
-     * @param _fromStrategy Whether to recover tokens from the strategy contract (true) or this contract (false).
+     * @param _fromVault Whether to recover tokens from the vault contract (true) or this contract (false).
      */
-    function recoverERC721(address _tokenAddress, address _recipient, uint256 _tokenId, bool _fromStrategy) external;
+    function recoverERC721(address _tokenAddress, address _recipient, uint256 _tokenId, bool _fromVault) external;
 
     /* ========== EVENTS ========== */
 

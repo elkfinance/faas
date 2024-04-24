@@ -12,11 +12,11 @@
 pragma solidity >=0.8.0;
 
 /**
- * @title IStakingStrategy Interface
- * @dev This interface defines the basic functionality for a staking strategy. It allows for staking and unstaking
+ * @title IStakingVault Interface
+ * @dev This interface defines the basic functionality for a staking vault. It allows for staking and unstaking
  * of tokens, querying balances and total supply, and recovery of accidentally sent ERC20 and ERC721 tokens.
  */
-interface IStakingStrategy {
+interface IStakingVault {
     /* ========== VIEW FUNCTIONS ========== */
 
     /**

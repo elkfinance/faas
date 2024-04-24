@@ -18,7 +18,7 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import { IStakingRewards } from "./interfaces/IStakingRewards.sol";
-import { IStakingStrategy } from "./interfaces/IStakingStrategy.sol";
+import { IStakingVault } from "./interfaces/IStakingVault.sol";
 
 /**
  * @title StakingRewards
@@ -32,7 +32,7 @@ import { IStakingStrategy } from "./interfaces/IStakingStrategy.sol";
 contract StakingRewards is IStakingRewards, ReentrancyGuard, Ownable {
     using SafeERC20 for IERC20;
 
-    error InvalidStakingStrategyAddress();
+    error InvalidStakingVaultAddress();
     error NoRewardTokens();
     error NonPositiveDuration();
     error RewardArraysLengthMismatch();
@@ -50,7 +50,7 @@ contract StakingRewards is IStakingRewards, ReentrancyGuard, Ownable {
 
     /* ========== STATE VARIABLES ========== */
 
-    IStakingStrategy public immutable override stakingStrategy;
+    IStakingVault public immutable override stakingVault;
 
     /// @notice List of reward token interfaces
     IERC20[] public rewardTokens;
@@ -84,13 +84,13 @@ contract StakingRewards is IStakingRewards, ReentrancyGuard, Ownable {
 
     /**
      * @dev Constructor.
-     * @param _stakingStrategyAddress Address of the staking strategy contract.
+     * @param _stakingVaultAddress Address of the staking vault contract.
      * @param _rewardTokenAddresses Array of reward token addresses.
      * @param _rewardsDuration Duration of reward emission in seconds.
      */
-    constructor(address _stakingStrategyAddress, address[] memory _rewardTokenAddresses, uint256 _rewardsDuration) {
-        if (_stakingStrategyAddress == address(0)) revert InvalidStakingStrategyAddress();
-        stakingStrategy = IStakingStrategy(_stakingStrategyAddress);
+    constructor(address _stakingVaultAddress, address[] memory _rewardTokenAddresses, uint256 _rewardsDuration) {
+        if (_stakingVaultAddress == address(0)) revert InvalidStakingVaultAddress();
+        stakingVault = IStakingVault(_stakingVaultAddress);
         if (_rewardTokenAddresses.length == 0) revert NoRewardTokens();
         // Update reward data structures
         for (uint256 i = 0; i < _rewardTokenAddresses.length; ++i) {
@@ -105,7 +105,7 @@ contract StakingRewards is IStakingRewards, ReentrancyGuard, Ownable {
      * @return address The staking token contract address.
      */
     function stakingTokenAddress() public view returns (address) {
-        return stakingStrategy.stakingTokenAddress();
+        return stakingVault.stakingTokenAddress();
     }
 
     /**
@@ -114,7 +114,7 @@ contract StakingRewards is IStakingRewards, ReentrancyGuard, Ownable {
      * @param _amount amount to stake
      */
     function stake(uint256 _amount) public nonReentrant whenEmitting updateRewards(msg.sender) {
-        stakingStrategy.stake(msg.sender, _amount);
+        stakingVault.stake(msg.sender, _amount);
     }
 
     /**
@@ -122,14 +122,14 @@ contract StakingRewards is IStakingRewards, ReentrancyGuard, Ownable {
      * @param _amount amount to unstake
      */
     function unstake(uint256 _amount) public nonReentrant updateRewards(msg.sender) {
-        stakingStrategy.unstake(msg.sender, _amount);
+        stakingVault.unstake(msg.sender, _amount);
     }
 
     /**
      * @dev Returns the total supply of the staked token.
      */
     function totalSupply() external view returns (uint256) {
-        return stakingStrategy.totalSupply();
+        return stakingVault.totalSupply();
     }
 
     /**
@@ -137,7 +137,7 @@ contract StakingRewards is IStakingRewards, ReentrancyGuard, Ownable {
      * @param _account The address of the account.
      */
     function balances(address _account) external view returns (uint256) {
-        return stakingStrategy.balances(_account);
+        return stakingVault.balances(_account);
     }
 
     /**
@@ -145,7 +145,7 @@ contract StakingRewards is IStakingRewards, ReentrancyGuard, Ownable {
      */
     function exit() external nonReentrant updateRewards(msg.sender) {
         _beforeExit(msg.sender);
-        stakingStrategy.unstakeAll(msg.sender);
+        stakingVault.unstakeAll(msg.sender);
     }
 
     /* ========== VIEWS ========== */
@@ -165,7 +165,7 @@ contract StakingRewards is IStakingRewards, ReentrancyGuard, Ownable {
      * @return amount of reward per staked token
      */
     function rewardPerToken(address _tokenAddress) public view returns (uint256) {
-        if (stakingStrategy.totalSupply() == 0) {
+        if (stakingVault.totalSupply() == 0) {
             return rewardPerTokenStored[_tokenAddress];
         }
         return
@@ -173,7 +173,7 @@ contract StakingRewards is IStakingRewards, ReentrancyGuard, Ownable {
             ((lastTimeRewardApplicable() - lastUpdateTime) *
                 rewardRates[_tokenAddress] *
                 1e18) /
-            stakingStrategy.totalSupply();
+            stakingVault.totalSupply();
     }
 
     /**
@@ -184,7 +184,7 @@ contract StakingRewards is IStakingRewards, ReentrancyGuard, Ownable {
      */
     function earned(address _tokenAddress, address _account) public view returns (uint256) {
         return
-            (stakingStrategy.balances(_account) *
+            (stakingVault.balances(_account) *
                 (rewardPerToken(_tokenAddress) - userRewardPerTokenPaid[_tokenAddress][_account])) /
             1e18 +
             rewards[_tokenAddress][_account];
@@ -290,7 +290,7 @@ contract StakingRewards is IStakingRewards, ReentrancyGuard, Ownable {
      * @param _enabled Boolean indicating whether whitelisting is enabled.
      */
     function setWhitelisting(bool _enabled) external {
-        stakingStrategy.setWhitelisting(_enabled);
+        stakingVault.setWhitelisting(_enabled);
     }
 
     /**
@@ -299,7 +299,7 @@ contract StakingRewards is IStakingRewards, ReentrancyGuard, Ownable {
      * @param _whitelisted Boolean indicating whether to whitelist or dewhitelist the address.
      */
     function setWhitelist(address _account, bool _whitelisted) external {
-        stakingStrategy.setWhitelist(_account, _whitelisted);
+        stakingVault.setWhitelist(_account, _whitelisted);
     }
 
     /**
@@ -307,16 +307,16 @@ contract StakingRewards is IStakingRewards, ReentrancyGuard, Ownable {
      * @param _tokenAddress Address of the token.
      * @param _recipient Address of the recipient.
      * @param _amount Amount of tokens to recover.
-     * @param _fromStrategy Whether to recover from the staking strategy contract.
+     * @param _fromVault Whether to recover from the staking vault contract.
      */
     function recoverERC20(
         address _tokenAddress,
         address _recipient,
         uint256 _amount,
-        bool _fromStrategy
+        bool _fromVault
     ) external onlyOwner {
-        if (_fromStrategy) {
-            stakingStrategy.recoverERC20(_tokenAddress, _recipient, _amount);
+        if (_fromVault) {
+            stakingVault.recoverERC20(_tokenAddress, _recipient, _amount);
         } else {
             _beforeRecoverERC20(_tokenAddress, _recipient, _amount);
             IERC20(_tokenAddress).transfer(_recipient, _amount);
@@ -329,16 +329,16 @@ contract StakingRewards is IStakingRewards, ReentrancyGuard, Ownable {
      * @param _tokenAddress Address of the token.
      * @param _recipient Address of the recipient.
      * @param _tokenId ID of the token to recover.
-     * @param _fromStrategy Whether to recover from the staking strategy contract.
+     * @param _fromVault Whether to recover from the staking vault contract.
      */
     function recoverERC721(
         address _tokenAddress,
         address _recipient,
         uint256 _tokenId,
-        bool _fromStrategy
+        bool _fromVault
     ) external onlyOwner {
-        if (_fromStrategy) {
-            stakingStrategy.recoverERC721(_tokenAddress, _recipient, _tokenId);
+        if (_fromVault) {
+            stakingVault.recoverERC721(_tokenAddress, _recipient, _tokenId);
         } else {
             IERC721(_tokenAddress).safeTransferFrom(address(this), _recipient, _tokenId);
             emit RecoveredERC721(_tokenAddress, _recipient, _tokenId);
@@ -352,7 +352,7 @@ contract StakingRewards is IStakingRewards, ReentrancyGuard, Ownable {
      * @param _recipient address to receive the recovered reward tokens
      */
     function recoverLeftoverReward(address _tokenAddress, address _recipient) external onlyOwner whenNotEmitting {
-        if (stakingStrategy.totalSupply() > 0) revert StakingSupplyNotEmpty();
+        if (stakingVault.totalSupply() > 0) revert StakingSupplyNotEmpty();
         if (rewardTokenAddresses[_tokenAddress]) {
             _beforeRecoverLeftoverReward(_tokenAddress, _recipient);
             IERC20 token = IERC20(_tokenAddress);

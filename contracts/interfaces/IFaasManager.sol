@@ -28,14 +28,14 @@ interface IFaasManager {
         address _faasContractAddress,
         address _tokenAddress,
         uint256 _amount,
-        bool _fromStrategy
+        bool _fromVault
     ) external;
 
     function recoverERC721(
         address _faasContractAddress,
         address _tokenAddress,
         uint256 _tokenId,
-        bool _fromStrategy
+        bool _fromVault
     ) external;
 
     function recoverLeftoverReward(address _faasContractAddress, address _tokenAddress) external;
