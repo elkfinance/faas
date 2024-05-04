@@ -44,8 +44,8 @@ contract FaasFactory is IFaasFactory, Ownable {
     /// @notice all faasContracts associated with contract;
     address[] public allFaasContracts;
 
-    /// @notice get address of faasContract creator
-    mapping(address => address) public getCreator;
+    /// @notice get address of faasContract owner
+    mapping(address => address) public faasOwner;
 
     /// @notice address of faasContract manager
     address public faasContractManager;
@@ -68,7 +68,7 @@ contract FaasFactory is IFaasFactory, Ownable {
 
         isFaasContract[faasContractAddress] = true;
         faasContract[msg.sender][stakingTokenAddress] = faasContractAddress;
-        getCreator[faasContractAddress] = msg.sender;
+        faasOwner[faasContractAddress] = msg.sender;
         allFaasContracts.push(faasContractAddress);
 
         emit ContractCreated(faasContractAddress);
@@ -113,16 +113,16 @@ contract FaasFactory is IFaasFactory, Ownable {
 
     function transferFaasContractOwnership(address _faasContractAddress, address _newOwner) external {
         if (!isFaasContract[_faasContractAddress]) revert NotFaasContract();
-        if (getCreator[_faasContractAddress] != msg.sender) revert NotFaasContractOwner();
+        if (faasOwner[_faasContractAddress] != msg.sender) revert NotFaasContractOwner();
         _transferFaasContractOwnership(_faasContractAddress, _newOwner);
     }
 
     function _transferFaasContractOwnership(address _faasContractAddress, address _newOwner) private {
-        address creatorAddress = getCreator[_faasContractAddress];
+        address creatorAddress = faasOwner[_faasContractAddress];
         address stakingTokenAddress = IStakingRewards(_faasContractAddress).stakingTokenAddress();
 
         faasContract[creatorAddress][stakingTokenAddress] = address(0);
         faasContract[_newOwner][stakingTokenAddress] = _faasContractAddress;
-        getCreator[_faasContractAddress] = _newOwner;
+        faasOwner[_faasContractAddress] = _newOwner;
     }
 }

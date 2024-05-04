@@ -18,7 +18,7 @@ interface IFaasFactory {
 
     function allFaasContracts(uint256 idx) external view returns (address);
 
-    function getCreator(address) external view returns (address);
+    function faasOwner(address) external view returns (address);
 
     function faasContractManager() external view returns (address);
 
